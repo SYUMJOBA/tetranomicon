@@ -7,7 +7,7 @@
     "item": "minecraft:netherite_ingot"
   },
   "result": {
-    "item": "tetranomicon:netherite_opal"
+    "id": "tetranomicon:netherite_opal"
   },
   "template": {
     "item": "minecraft:netherite_upgrade_smithing_template"

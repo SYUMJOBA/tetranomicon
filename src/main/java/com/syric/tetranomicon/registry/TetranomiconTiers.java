@@ -6,30 +6,39 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Tier;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.block.Block;
-import net.minecraftforge.common.ForgeTier;
-import net.minecraftforge.common.TierSortingRegistry;
+import net.neoforged.neoforge.common.SimpleTier;
 import se.mickelus.tetra.TetraRegistries;
+import se.mickelus.tetra.tools.HarvestTierRegistry;
 
 import java.util.List;
 
 public class TetranomiconTiers {
 
     public static void init() {
-        TagKey<Block> eightTag = BlockTags.create(ResourceLocation.fromNamespaceAndPath("tetranomicon", "needs_tier_eight_tool"));
-        Tier eightTier = TierSortingRegistry.registerTier(new ForgeTier(TetraRegistries.forgeHammerTier.getLevel() + 1, 0, 0, 0, 0,
-                eightTag, () -> Ingredient.EMPTY), ResourceLocation.fromNamespaceAndPath("tetranomicon", "tier_eight"), List.of(TetraRegistries.forgeHammerTier), List.of());
+        // Tetranomicon adds four tiers above Tetra's maxed forge hammer, chained by the after/before DAG
+        // (there is no harvest-level int in 1.21). Each tier's SimpleTier takes an "incorrect for drops"
+        // block tag (the inverse of the old ForgeTier "needs this tier" tag); shipping those tags empty /
+        // pointing at the forge hammer's incorrect set makes these top tiers mine everything it can and more.
+        Tier eightTier = registerTier("tier_eight", "incorrect_for_tier_eight_tool",
+                List.of(TetraRegistries.forgeHammerTier));
 
-        TagKey<Block> nineTag = BlockTags.create(ResourceLocation.fromNamespaceAndPath("tetranomicon", "needs_tier_nine_tool"));
-        Tier nineTier = TierSortingRegistry.registerTier(new ForgeTier(TetraRegistries.forgeHammerTier.getLevel() + 2, 0, 0, 0, 0,
-                nineTag, () -> Ingredient.EMPTY), ResourceLocation.fromNamespaceAndPath("tetranomicon", "tier_nine"), List.of(eightTier), List.of());
+        Tier nineTier = registerTier("tier_nine", "incorrect_for_tier_nine_tool",
+                List.of(eightTier));
 
-        TagKey<Block> tenTag = BlockTags.create(ResourceLocation.fromNamespaceAndPath("tetranomicon", "needs_tier_ten_tool"));
-        Tier tenTier = TierSortingRegistry.registerTier(new ForgeTier(TetraRegistries.forgeHammerTier.getLevel() + 3, 0, 0, 0, 0,
-                tenTag, () -> Ingredient.EMPTY), ResourceLocation.fromNamespaceAndPath("tetranomicon", "tier_ten"), List.of(nineTier), List.of());
+        Tier tenTier = registerTier("tier_ten", "incorrect_for_tier_ten_tool",
+                List.of(nineTier));
 
-        TagKey<Block> elevenTag = BlockTags.create(ResourceLocation.fromNamespaceAndPath("tetranomicon", "needs_tier_eleven_tool"));
-        Tier elevenTier = TierSortingRegistry.registerTier(new ForgeTier(TetraRegistries.forgeHammerTier.getLevel() + 4, 0, 0, 0, 0,
-                elevenTag, () -> Ingredient.EMPTY), ResourceLocation.fromNamespaceAndPath("tetranomicon", "tier_eleven"), List.of(tenTier), List.of());
+        registerTier("tier_eleven", "incorrect_for_tier_eleven_tool",
+                List.of(tenTier));
+    }
+
+    private static Tier registerTier(String name, String incorrectTagPath, List<Tier> after) {
+        TagKey<Block> incorrectTag = BlockTags.create(ResourceLocation.fromNamespaceAndPath("tetranomicon", incorrectTagPath));
+        return HarvestTierRegistry.register(
+                new SimpleTier(incorrectTag, 0, 0, 0, 0, () -> Ingredient.EMPTY),
+                ResourceLocation.fromNamespaceAndPath("tetranomicon", name),
+                after,
+                List.of());
     }
 
 }

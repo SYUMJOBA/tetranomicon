@@ -11,7 +11,7 @@
     "outcomes": [
       {
           "material": {
-              "tag": "forge:scales/fire_dragon",
+              "tag": "c:scales/fire_dragon",
               "count": 4
           },
           "requiredTools": {
@@ -23,7 +23,7 @@
       },
       {
           "material": {
-              "tag": "forge:scales/ice_dragon",
+              "tag": "c:scales/ice_dragon",
               "count": 4
           },
           "requiredTools": {
@@ -35,7 +35,7 @@
       },
       {
           "material": {
-              "tag": "forge:scales/lightning_dragon",
+              "tag": "c:scales/lightning_dragon",
               "count": 4
           },
           "requiredTools": {
@@ -47,7 +47,7 @@
       },
       {
           "material": {
-              "tag": "forge:scales/sea_serpent",
+              "tag": "c:scales/sea_serpent",
               "count": 4
           },
           "requiredTools": {

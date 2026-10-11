@@ -2,7 +2,7 @@
     {
         "conditions": [
             {
-                "type": "forge:mod_loaded",
+                "type": "neoforge:mod_loaded",
                 "modid": "enlightened_end"
             }
         ],
@@ -30,7 +30,7 @@
     {
         "conditions": [
             {
-                "type": "forge:mod_loaded",
+                "type": "neoforge:mod_loaded",
                 "modid": "enlightened_end"
             }
         ],
@@ -58,7 +58,7 @@
     {
         "conditions": [
             {
-                "type": "forge:mod_loaded",
+                "type": "neoforge:mod_loaded",
                 "modid": "enlightened_end"
             }
         ],
@@ -90,7 +90,7 @@
     {
         "conditions": [
             {
-                "type": "forge:mod_loaded",
+                "type": "neoforge:mod_loaded",
                 "modid": "enlightened_end"
             }
         ],
@@ -118,7 +118,7 @@
     {
         "conditions": [
             {
-                "type": "forge:mod_loaded",
+                "type": "neoforge:mod_loaded",
                 "modid": "enlightened_end"
             }
         ],
@@ -142,7 +142,7 @@
     {
         "conditions": [
             {
-                "type": "forge:mod_loaded",
+                "type": "neoforge:mod_loaded",
                 "modid": "enlightened_end"
             }
         ],

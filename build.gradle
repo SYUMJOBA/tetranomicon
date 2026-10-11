@@ -1,336 +1,124 @@
-buildscript {
-    repositories {
-        mavenLocal()
-        maven { url = 'https://files.minecraftforge.net/maven' }
-        maven { url = "https://plugins.gradle.org/m2/" }
-        mavenCentral()
-    }
-    dependencies {
-        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '5.1.+', changing: true
-        classpath "com.wynprice.cursemaven:CurseMaven:2.1.1"
-    }
-}
-
 plugins {
-    id 'eclipse'
-    id 'idea'
+    id 'java-library'
     id 'maven-publish'
-    id 'net.minecraftforge.gradle' version '[6.0,6.2)'
-    id 'org.spongepowered.mixin' version '0.7.+'
+    id 'net.neoforged.moddev' version '2.0.141'
+    id 'idea'
 }
 
-version = mod_version
+if (System.getenv('VERSION') != null) {
+    mod_version = System.getenv('VERSION')
+}
+
+tasks.named('wrapper', Wrapper).configure {
+    distributionType = Wrapper.DistributionType.BIN
+}
+
+version = "${minecraft_version}-${mod_version}"
 group = mod_group_id
+
+repositories {
+    mavenLocal()
+    maven { url = "https://maven.theillusivec4.top/" }
+    maven { url = 'https://maven.blamejared.com/' }
+    maven { url = 'https://cursemaven.com' }
+}
+
 base {
     archivesName = mod_id
 }
 
-java.toolchain.languageVersion = JavaLanguageVersion.of(17)
+java.toolchain.languageVersion = JavaLanguageVersion.of(21)
 
-println "Java: ${System.getProperty 'java.version'}, JVM: ${System.getProperty 'java.vm.version'} (${System.getProperty 'java.vendor'}), Arch: ${System.getProperty 'os.arch'}"
-minecraft {
-    mappings channel: mapping_channel, version: mapping_version
-    copyIdeResources = true
+neoForge {
+    version = project.neo_version
+
+    parchment {
+        mappingsVersion = project.parchment_mappings_version
+        minecraftVersion = project.parchment_minecraft_version
+    }
 
     runs {
-        // applies to all the run configs below
-        configureEach {
-            workingDirectory project.file('run')
-
-            // Recommended logging data for a userdev environment
-            // The markers can be added/remove as needed separated by commas.
-            // "SCAN": For mods scan.
-            // "REGISTRIES": For firing of registry events.
-            // "REGISTRYDUMP": For getting the contents of all registries.
-            property 'forge.logging.markers', 'REGISTRIES'
-
-            // Recommended logging level for the console
-            // You can set various levels here.
-            // Please read: https://stackoverflow.com/questions/2031163/when-to-use-the-different-log-levels
-            property 'forge.logging.console.level', 'debug'
-
-            mods {
-                "${mod_id}" {
-                    source sourceSets.main
-                }
-            }
-        }
-
         client {
-            // Comma-separated list of namespaces to load gametests from. Empty = all namespaces.
-            property 'forge.enabledGameTestNamespaces', mod_id
+            client()
+            systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
         }
 
         server {
-            property 'forge.enabledGameTestNamespaces', mod_id
-        }
-
-        // This run config launches GameTestServer and runs all registered gametests, then exits.
-        // By default, the server will crash when no gametests are provided.
-        // The gametest system is also enabled by default for other run configs under the /test command.
-        gameTestServer {
-            property 'forge.enabledGameTestNamespaces', mod_id
+            server()
+            programArgument '--nogui'
+            systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
         }
 
         data {
-            // example of overriding the workingDirectory set in configureEach above
-            workingDirectory project.file('run-data')
+            data()
+            programArguments.addAll '--mod', project.mod_id, '--all', '--output', file('src/generated/resources/').getAbsolutePath(), '--existing', file('src/main/resources/').getAbsolutePath()
+        }
 
-            // Specify the modid for data generation, where to output the resulting resource, and where to look for existing resources.
-            args '--mod', mod_id, '--all', '--output', file('src/generated/resources/'), '--existing', file('src/main/resources/')
+        configureEach {
+            systemProperty 'forge.logging.markers', 'REGISTRIES'
+            logLevel = org.slf4j.event.Level.DEBUG
         }
     }
-}
 
-repositories {
-    maven {
-        name = "cursemaven"
-        url = "https://cursemaven.com"
-        content {
-            includeGroup "curse.maven"
+    mods {
+        "${mod_id}" {
+            sourceSet(sourceSets.main)
         }
     }
-    exclusiveContent {
-        forRepository {
-            maven {
-                name = "Modrinth"
-                url = "https://api.modrinth.com/maven"
-            }
-        }
-        forRepositories(fg.repository) // Only add this if you're using ForgeGradle, otherwise remove this line
-        filter {
-            includeGroup "maven.modrinth"
-        }
-    }
-    mavenCentral()
-//    maven { url 'https://jitpack.io/' }
 }
 
 dependencies {
-    minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
-
-    //Tetra (requires mutil)
-    implementation fg.deobf("curse.maven:tetra-289712:8087612")
-//    implementation fg.deobf("curse.maven:scroll-of-harvests-571339:4706191")
-
-    //PREVIOUSLY SUPPORTED
-//    //Atmospheric (requires Blueprint)
-//    implementation fg.deobf("curse.maven:atmospheric-362393:6057624")
-//    //Autumnity (Requires Blueprint)
-//    implementation fg.deobf("curse.maven:autumnity-365045:5292346")
-//    //BOP (requires terrablender and glitchcore)
-//    implementation fg.deobf("curse.maven:biomes-o-plenty-220318:6028852")
-//    //Create
-//    implementation fg.deobf("curse.maven:create-328085:5838779")
-//    //Enderite (requires architectury api and cloth config)
-//    implementation fg.deobf("curse.maven:enderite-mod-for-forge-401284:5017690")
-//    //Endergetic Expansion (requires Blueprint)
-//    implementation fg.deobf("curse.maven:endergetic-291509:6157658")
-//    //Environmental (requires Blueprint)
-//    implementation fg.deobf("curse.maven:environmental-388992:6060255")
-//    //Ice and Fire (requires Citadel)
-//    implementation fg.deobf("curse.maven:ice-and-fire-dragons-264231:5633453")
-//    //Outer End (Requires Blueprint)
-//    implementation fg.deobf("curse.maven:the-outer-end-430404:5812948")
-//    //Stalwart Dungeons
-//    implementation fg.deobf("curse.maven:stalwart-dungeons-474817:4703671")
-//    //Twilight Forest
-//    implementation fg.deobf("curse.maven:the-twilight-forest-227639:5468648")
-//    //Upgrade Aquatic
-//    implementation fg.deobf("curse.maven:upgrade-aquatic-326895:6157694")
-//    //Unearthed (requires Hyle)
-//    implementation fg.deobf("curse.maven:unearthed-406825:6223916")
-//    //Quark (requires Zeta)
-//    implementation fg.deobf("curse.maven:quark-243121:5594847")
-
-
-    //SET ONE
-//    //Alex's Caves (requires citadel)
-//    implementation fg.deobf("curse.maven:alexs-caves-924854:5848216")
-//    //Blue Skies (requires structure gel)
-//    implementation fg.deobf("curse.maven:blue-skies-312918:5010316")
-//    //Deeper and Darker
-//    implementation fg.deobf("curse.maven:deeperdarker-659011:5906086")
-//    //Mo' Shiz
-//    implementation fg.deobf("curse.maven:mo-shiz-mod-62536:5587177")
-//    //Regions Unexplored
-//    implementation fg.deobf("curse.maven:regions-unexplored-659110:5558225")
-
-    //Ores Above Diamond
-    implementation fg.deobf("curse.maven:ores-above-diamonds-351339:4682592") //Required always!
-
-    //SET 2
-//    //Endless Biomes
-//    implementation fg.deobf("curse.maven:endless-biomes-667688:5679839")
-//    //Enlightend
-//    implementation fg.deobf("curse.maven:enlightend-502786:4880586")
-    //Galosphere
-    runtimeOnly fg.deobf("maven.modrinth:galosphere:1.20.1-1.5.2")
-//    //Voidscape
-//    implementation fg.deobf("curse.maven:voidscape-251730:5179872")
-//    //Organics
-//    implementation fg.deobf("curse.maven:organics-411399:4703550")
-
-
-    //SET 3
-//    //Deep Dark Regrowth (requires geckolib)
-//    implementation fg.deobf("curse.maven:deep-dark-regrowth-827619:5308579")
-//    //Silent's Gems (requires silent-lib)
-//    implementation fg.deobf("curse.maven:silents-gems-220311:5193708")
-//    //Silent Gear
-//    implementation fg.deobf("curse.maven:silent-gear-297039:5640724")
-//    //Nature Arise (requires terrablender)
-//    implementation fg.deobf("curse.maven:nature-arise-639540:5668413")
-//    //Ad Astra (requires resourceful-lib, resourceful-config, and botarium)
-//    implementation fg.deobf("curse.maven:ad-astra-635042:5914893")
-//    //Aquamirae (requires obscure api)
-//    implementation fg.deobf("curse.maven:ob-aquamirae-536254:4616373")
-
-
-    //SET 4
-//    //L2 Complements (Requires L2 Library)
-//    implementation fg.deobf("curse.maven:l2-complements-758349:6040201")
-//    //Samurai Dynasty (Requires AzureLib and Curios)
-//    implementation fg.deobf("curse.maven:samurai-dynasty-848381:5672395")
-//    //Ecologics
-//    implementation fg.deobf("curse.maven:ecologics-570463:4857272")
-
-
-    //SET 5
-    //Embers Rekindled
-//    implementation fg.deobf("curse.maven:embers-rekindled-300777:6103508")
-    //Tropicraft
-//    implementation fg.deobf("curse.maven:tropicraft-254794:4811116")
-    //Ore and More
-//    implementation fg.deobf("curse.maven:oam-by-choupiclou2007-421326:6014464")
-    //Unusual Prehistory (requires GeckoLib)
-//    implementation fg.deobf("curse.maven:unusual-prehistory-forge-696283:4884372")
-//    //Forbidden Arcanus (Requires Valhelsia Core) (thereby incompatible with Quark)
-//   implementation fg.deobf("curse.maven:forbidden-arcanus-309858:5198323")
-    //Alex's Mobs (requires Citadel)
-//    implementation fg.deobf("curse.maven:alexs-mobs-426558:5698791")
-
-
-    //SET 6
-    //
-
-
-    //FABRIC
-    //BetterEnd (requires Fabric API and BCLib)
-//    implementation fg.deobf("curse.maven:betterend-413596:4971487")
-    //BetterNether (requires Fabric API and BCLib) (incompatible with Quark)
-//    implementation fg.deobf("curse.maven:betternether-311377:4971478")
-
-
-    //REMOVED
-//    //Majrusz's Progressive Difficulty (requires Majrusz library) (broken)
-//    implementation fg.deobf("curse.maven:majruszs-progressive-difficulty-430642:5293465")
-//    //End's Phantasm (requires sinytra connector and forgified fabric api)
-//    implementation fg.deobf("curse.maven:phantasm-565254:6140585") //(causing crashes)
-
-    //JEI
-    runtimeOnly fg.deobf("maven.modrinth:jei:RTFeXsvE")
-    runtimeOnly fg.deobf("maven.modrinth:just-enough-resources-jer:1.4.0.247")
-    runtimeOnly fg.deobf("maven.modrinth:forge-config-screens:v8.0.2-1.20.1-Forge")
-
-    //Optimization
-    runtimeOnly fg.deobf("maven.modrinth:embeddium:0.3.31+mc1.20.1")
-    runtimeOnly fg.deobf("maven.modrinth:chloride:FORGE-mc1.20.1-v1.7.7")
-    runtimeOnly fg.deobf("maven.modrinth:oculus:1.20.1-1.8.0")
-
-
-    //Libraries and Dependencies
-    implementation fg.deobf("curse.maven:mutil-351914:7772906")
-//    implementation fg.deobf("curse.maven:terrablender-563928:5378180")
-//    implementation fg.deobf("curse.maven:glitchcore-955399:5787839")
-//    implementation fg.deobf("curse.maven:architectury-api-419699:5137938")
-//    implementation fg.deobf("curse.maven:cloth-config-348521:5729105")
-//    implementation fg.deobf("curse.maven:citadel-331936:6002521")
-//    implementation fg.deobf("curse.maven:blueprint-382216:6143229")
-//    implementation fg.deobf("curse.maven:hyle-609850:6223810")
-//    implementation fg.deobf("curse.maven:zeta-968868:5597406")
-//    implementation fg.deobf("curse.maven:structure-gel-api-378802:5278429")
-//    implementation fg.deobf("curse.maven:sinytra-connector-890127:5761411")
-//    implementation fg.deobf("curse.maven:forgified-fabric-api-889079:6136695")
-//    implementation fg.deobf("curse.maven:connector-extras-913445:5490637")
-//    implementation fg.deobf("curse.maven:geckolib-388172:6027567")
-//    implementation fg.deobf("curse.maven:silent-lib-242998:4585754")
-//    implementation fg.deobf("curse.maven:resourceful-lib-570073:5659871")
-//    implementation fg.deobf("curse.maven:resourceful-config-714059:5020441")
-//    implementation fg.deobf("curse.maven:botarium-704113:5486070")
-//    implementation fg.deobf("curse.maven:obscure-api-638417:4616364")
-//    implementation fg.deobf("curse.maven:l2library-620203:5921890")
-//    implementation fg.deobf("curse.maven:azurelib-817423:6004977")
-//    implementation fg.deobf("curse.maven:curios-309927:6058834")
-//    implementation fg.deobf("curse.maven:valhelsia-core-416935:5189548") //apparently incompatible with Quark??
-//    implementation fg.deobf("curse.maven:patchouli-306770:4966125")
-//    implementation fg.deobf("curse.maven:bclib-495191:4971470")
-
-
-//    implementation fg.deobf("curse.maven:majrusz-library-437409:5302100") //broken
-
-    // Apply Mixin AP
-    annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
-
-    compileOnly(annotationProcessor("io.github.llamalad7:mixinextras-common:0.5.3"))
-    implementation(jarJar("io.github.llamalad7:mixinextras-forge:0.5.3")) {
-        jarJar.ranged(it, "[0.5.3,)")
-    }
-
+    implementation "se.mickelus.mutil:mutil:${mutil_version}"
+    implementation "se.mickelus.tetra:tetra:${tetra_version}"
 }
 
-// This block of code expands all declared replace properties in the specified resource targets.
-// A missing property will result in an error. Properties are expanded using ${} Groovy notation.
-// When "copyIdeResources" is enabled, this will also run before the game launches in IDE environments.
-// See https://docs.gradle.org/current/dsl/org.gradle.language.jvm.tasks.ProcessResources.html
-tasks.named('processResources', ProcessResources).configure {
+// Expand mod metadata placeholders from src/main/templates into the build.
+var generateModMetadata = tasks.register("generateModMetadata", ProcessResources) {
     var replaceProperties = [
-            minecraft_version: minecraft_version, minecraft_version_range: minecraft_version_range,
-            forge_version: forge_version, forge_version_range: forge_version_range,
-            loader_version_range: loader_version_range,
-            mod_id: mod_id, mod_name: mod_name, mod_license: mod_license, mod_version: mod_version,
-            mod_authors: mod_authors, mod_description: mod_description,
+            minecraft_version      : minecraft_version,
+            minecraft_version_range: minecraft_version_range,
+            neo_version            : neo_version,
+            neo_version_range      : neo_version_range,
+            loader_version_range   : loader_version_range,
+            mod_id                 : mod_id,
+            mod_name               : mod_name,
+            mod_license            : mod_license,
+            mod_version            : mod_version,
+            mod_authors            : mod_authors,
+            mod_description        : mod_description,
+            mutil_version          : mutil_version,
+            mutil_version_range    : mutil_version_range,
+            tetra_version          : tetra_version,
+            tetra_version_range    : tetra_version_range,
     ]
     inputs.properties replaceProperties
-
-    filesMatching(['META-INF/mods.toml', 'pack.mcmeta']) {
-        expand replaceProperties + [project: project]
-    }
+    expand replaceProperties
+    from "src/main/templates"
+    into "build/generated/sources/modMetadata"
 }
+sourceSets.main.resources.srcDir generateModMetadata
+neoForge.ideSyncTask generateModMetadata
 
-
-// Example for how to get properties into the manifest for reading at runtime.
-tasks.named('jar', Jar).configure {
-    manifest {
-        attributes([
-                'Specification-Title'     : mod_id,
-                'Specification-Vendor'    : mod_authors,
-                'Specification-Version'   : '1', // We are version 1 of ourselves
-                'Implementation-Title'    : project.name,
-                'Implementation-Version'  : project.jar.archiveVersion,
-                'Implementation-Vendor'   : mod_authors,
-                'Implementation-Timestamp': new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
-        ])
-    }
-
-    // This is the preferred method to reobfuscate your jar file
-    finalizedBy 'reobfJar'
-}
-
-// Example configuration to allow publishing using the maven-publish plugin
 publishing {
     publications {
         register('mavenJava', MavenPublication) {
-            artifact jar
+            from components.java
         }
     }
     repositories {
         maven {
-            url "file://${project.projectDir}/mcmodsrepo"
+            url = uri("file://${System.getenv("local_maven")}")
         }
     }
 }
 
 tasks.withType(JavaCompile).configureEach {
-    options.encoding = 'UTF-8' // Use the UTF-8 charset for Java compilation
+    options.encoding = 'UTF-8'
+}
+
+idea {
+    module {
+        downloadSources = true
+        downloadJavadoc = true
+    }
 }

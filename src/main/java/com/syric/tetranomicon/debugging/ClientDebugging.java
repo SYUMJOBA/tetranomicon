@@ -3,26 +3,27 @@ package com.syric.tetranomicon.debugging;
 import com.mojang.datafixers.util.Either;
 import com.syric.tetranomicon.Tetranomicon;
 import net.minecraft.ChatFormatting;
-import net.minecraft.advancements.critereon.ItemPredicate;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.client.event.RenderTooltipEvent;
-import net.minecraftforge.common.Tags;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.client.event.RenderTooltipEvent;
+import net.neoforged.neoforge.common.Tags;
 import org.jetbrains.annotations.NotNull;
 import se.mickelus.tetra.ConfigHandler;
 import se.mickelus.tetra.data.DataManager;
+import se.mickelus.tetra.data.predicate.TetraItemPredicate;
 
 import java.util.List;
 
 @OnlyIn(Dist.CLIENT)
-@Mod.EventBusSubscriber(modid = Tetranomicon.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.CLIENT)
+@EventBusSubscriber(modid = Tetranomicon.MODID, bus = EventBusSubscriber.Bus.GAME, value = Dist.CLIENT)
 public class ClientDebugging {
 
     @SubscribeEvent
@@ -34,17 +35,17 @@ public class ClientDebugging {
             return;
         }
         List<Either<FormattedText, TooltipComponent>> components = event.getTooltipElements();
-        String item_id = event.getItemStack().getItem().toString();
-        String mod_id = event.getItemStack().getItem().getCreatorModId(event.getItemStack());
+        String item_id = BuiltInRegistries.ITEM.getKey(event.getItemStack().getItem()).toString();
+        String mod_id = BuiltInRegistries.ITEM.getKey(event.getItemStack().getItem()).getNamespace();
         mod_id = mod_id == null ? " " : mod_id;
         ItemStack stack = event.getItemStack();
 
-        boolean likelyCandidateTags = (stack.is(Tags.Items.STONE) || stack.is(ItemTags.PLANKS) || stack.is(Tags.Items.INGOTS) || stack.is(Tags.Items.GEMS));
+        boolean likelyCandidateTags = (stack.is(Tags.Items.STONES) || stack.is(ItemTags.PLANKS) || stack.is(Tags.Items.INGOTS) || stack.is(Tags.Items.GEMS));
         boolean likelyCandidateID = (item_id.contains("planks") || item_id.contains("ingot"));
         boolean minecraft = mod_id.contains("minecraft");
         boolean likelyCandidate = likelyCandidateID || likelyCandidateTags && !minecraft;
         boolean isTetraMaterial = DataManager.instance.materialData.getData().values().stream().anyMatch(x -> {
-            ItemPredicate predicate = x.material.getPredicate();
+            TetraItemPredicate predicate = x.material.getPredicate();
             if (predicate != null) {
                 if (x.material.isTagged()) {
                     return false;
