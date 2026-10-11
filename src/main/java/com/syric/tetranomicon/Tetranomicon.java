@@ -2,11 +2,10 @@ package com.syric.tetranomicon;
 
 import com.syric.tetranomicon.registry.TetranomiconItems;
 import com.syric.tetranomicon.registry.TetranomiconTiers;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.fml.ModList;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.fml.ModContainer;
+import net.neoforged.fml.ModList;
+import net.neoforged.fml.common.Mod;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -15,15 +14,13 @@ public class Tetranomicon {
     public static final String MODID = "tetranomicon";
     public static final Logger LOGGER = LogManager.getLogger();
 
-    public Tetranomicon (FMLJavaModLoadingContext context) {
-        MinecraftForge.EVENT_BUS.register(this);
+    public Tetranomicon(ModContainer container) {
         TetranomiconTiers.init();
 
-        IEventBus modEventBus = context.getModEventBus();
+        IEventBus modEventBus = container.getEventBus();
         if (ModList.get().isLoaded("oresabovediamonds") || ModList.get().isLoaded("betternether")) {
             TetranomiconItems.ITEMS.register(modEventBus);
         }
-
     }
 
 }

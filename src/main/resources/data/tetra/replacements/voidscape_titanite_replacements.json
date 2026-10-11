@@ -2,7 +2,7 @@
     {
         "conditions": [
             {
-                "type": "forge:mod_loaded",
+                "type": "neoforge:mod_loaded",
                 "modid": "voidscape"
             }
         ],
@@ -30,7 +30,7 @@
     {
         "conditions": [
             {
-                "type": "forge:mod_loaded",
+                "type": "neoforge:mod_loaded",
                 "modid": "voidscape"
             }
         ],
@@ -58,7 +58,7 @@
     {
         "conditions": [
             {
-                "type": "forge:mod_loaded",
+                "type": "neoforge:mod_loaded",
                 "modid": "voidscape"
             }
         ],
@@ -86,7 +86,7 @@
     {
         "conditions": [
             {
-                "type": "forge:mod_loaded",
+                "type": "neoforge:mod_loaded",
                 "modid": "voidscape"
             }
         ],

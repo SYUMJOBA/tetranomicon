@@ -19,7 +19,7 @@
     "outcomes": [
         {
             "material": {
-                "tag": "forge:scales/sea_serpent",
+                "tag": "c:scales/sea_serpent",
                 "count": 6
             },
             "requiredTools": {

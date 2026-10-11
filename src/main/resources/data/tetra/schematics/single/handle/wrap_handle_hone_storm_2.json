@@ -19,7 +19,7 @@
     "outcomes": [
         {
             "material": {
-                "tag": "forge:scales/lightning_dragon",
+                "tag": "c:scales/lightning_dragon",
                 "count": 8
             },
             "requiredTools": {

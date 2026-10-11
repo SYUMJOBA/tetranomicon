@@ -19,7 +19,7 @@
     "outcomes": [
         {
             "material": {
-                "tag": "forge:scales/ice_dragon",
+                "tag": "c:scales/ice_dragon",
                 "count": 8
             },
             "requiredTools": {

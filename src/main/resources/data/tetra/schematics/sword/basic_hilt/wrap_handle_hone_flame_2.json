@@ -19,7 +19,7 @@
     "outcomes": [
         {
             "material": {
-                "tag": "forge:scales/fire_dragon",
+                "tag": "c:scales/fire_dragon",
                 "count": 8
             },
             "requiredTools": {

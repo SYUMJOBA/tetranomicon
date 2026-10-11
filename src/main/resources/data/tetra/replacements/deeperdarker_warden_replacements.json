@@ -2,7 +2,7 @@
     {
         "conditions": [
             {
-                "type": "forge:mod_loaded",
+                "type": "neoforge:mod_loaded",
                 "modid": "deeperdarker"
             }
         ],
@@ -30,7 +30,7 @@
     {
         "conditions": [
             {
-                "type": "forge:mod_loaded",
+                "type": "neoforge:mod_loaded",
                 "modid": "deeperdarker"
             }
         ],
@@ -58,7 +58,7 @@
     {
         "conditions": [
             {
-                "type": "forge:mod_loaded",
+                "type": "neoforge:mod_loaded",
                 "modid": "deeperdarker"
             }
         ],
@@ -86,7 +86,7 @@
     {
         "conditions": [
             {
-                "type": "forge:mod_loaded",
+                "type": "neoforge:mod_loaded",
                 "modid": "deeperdarker"
             }
         ],
@@ -110,7 +110,7 @@
     {
         "conditions": [
             {
-                "type": "forge:mod_loaded",
+                "type": "neoforge:mod_loaded",
                 "modid": "deeperdarker"
             }
         ],
